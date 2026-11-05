@@ -17,6 +17,7 @@ encrypted_message = encrypt_ecb(plaintext, KEY)
 
 print("\nOriginal Message:", message)
 print("Encrypted Message (HEX):", encrypted_message.hex())
+print("Encrypted Message (Binary):", ''.join(format(byte, '08b') for byte in encrypted_message))
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
