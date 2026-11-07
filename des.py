@@ -235,19 +235,3 @@ def decrypt_ecb(ciphertext, key):
 
     return padded[:-amount]
 
-
-if __name__ == "__main__":
-    demo_key = b"12345678"
-    demo_message = b"PAY0500!"
-
-    print("Example plaintext:", demo_message.decode())
-    print("DES key (hex):", demo_key.hex())
-
-    encrypted = encrypt_ecb(
-        demo_message,
-        demo_key,
-        show_first_round=True
-    )
-
-    print("Full DES-ECB ciphertext (hex):", encrypted.hex())
-    print("Decrypted:", decrypt_ecb(encrypted, demo_key).decode())
