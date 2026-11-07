@@ -21,7 +21,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     with connection:
         print("Client connected:", address)
 
-        # Receive encrypted message
         encrypted_message = b""
 
         while True:

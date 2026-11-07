@@ -7,10 +7,14 @@ IP = [
 ]
 
 IP_INV = [
-    40,8,48,16,56,24,64,32,39,7,47,15,55,23,63,31,
-    38,6,46,14,54,22,62,30,37,5,45,13,21,61,29,
-    36,4,44,12,52,20,60,28,35,3,43,11,51,19,59,27,
-    34,2,42,10,50,18,58,26,33,1,41,9,49,17,57,25,
+    40,8,48,16,56,24,64,32,
+    39,7,47,15,55,23,63,31,
+    38,6,46,14,54,22,62,30,
+    37,5,45,13,53,21,61,29,
+    36,4,44,12,52,20,60,28,
+    35,3,43,11,51,19,59,27,
+    34,2,42,10,50,18,58,26,
+    33,1,41,9,49,17,57,25,
 ]
 
 E = [
@@ -99,7 +103,6 @@ def bits(value, width):
 
 
 def permute(value, input_width, table):
-    """Read 1-indexed bit positions, with position 1 the most significant bit."""
     output = 0
 
     for position in table:
@@ -144,15 +147,11 @@ def generate_round_keys(key):
 
 
 def des_round(left, right, round_key):
-    """Perform one complete DES Feistel round."""
-
-    # Step 1: Expansion (32 bits to 48 bits)
+  
     expanded = permute(right, 32, E)
 
-    # Step 2: XOR with round key
     mixed = expanded ^ round_key
 
-    # Step 3: S-box substitution (48 bits to 32 bits)
     substituted = 0
 
     for index in range(8):
@@ -165,10 +164,9 @@ def des_round(left, right, round_key):
 
         substituted = (substituted << 4) | result
 
-    # Step 4: P-box permutation
     p_output = permute(substituted, 32, P)
 
-    # Step 5: Calculate the new halves
+
     new_left = right
     new_right = left ^ p_output
 
@@ -176,47 +174,42 @@ def des_round(left, right, round_key):
 
 
 def process_block(block, round_keys, show_first_round=False):
-    """Process one 8-byte block using 16 DES rounds."""
 
     if len(block) != BLOCK_SIZE:
         raise ValueError("DES block must be exactly 8 bytes")
 
     input64 = int.from_bytes(block, "big")
 
-    # Initial Permutation
     initial = permute(input64, 64, IP)
 
     left = initial >> 32
     right = initial & 0xFFFFFFFF
 
-    # Perform all 16 Feistel rounds
     for index, subkey in enumerate(round_keys):
 
         left, right = des_round(left, right, subkey)
 
-        # Display only the first round results
         if show_first_round and index == 0:
-            print("\n===== FIRST FEISTEL ROUND RESULTS =====")
+            print("\nFIRST ROUND RESULTS:")
             print("L1:", bits(left, 32))
             print("R1:", bits(right, 32))
+            print("L1+R1:",bits(left, 32),bits(right, 32))
             print("=======================================")
 
-    # Final swap
+ 
     preoutput = (right << 32) | left
 
-    # Final Permutation
     output64 = permute(preoutput, 64, IP_INV)
 
     return output64.to_bytes(8, "big")
 
 
 def encrypt_ecb(plaintext, key, show_first_round=False):
-    """Encrypt plaintext using DES in ECB mode."""
+
 
     if not isinstance(plaintext, bytes):
         raise TypeError("Plaintext must be bytes")
 
-    # PKCS#7 padding
     padding_length = BLOCK_SIZE - len(plaintext) % BLOCK_SIZE
 
     padded = plaintext + bytes([padding_length]) * padding_length
@@ -240,7 +233,6 @@ def encrypt_ecb(plaintext, key, show_first_round=False):
 
 
 def decrypt_ecb(ciphertext, key):
-    """Decrypt ciphertext using DES in ECB mode."""
 
     if (
         not isinstance(ciphertext, bytes)
@@ -251,7 +243,6 @@ def decrypt_ecb(ciphertext, key):
             "Ciphertext must contain complete 8-byte blocks"
         )
 
-    # Reverse the round-key order for decryption
     keys = generate_round_keys(key)[::-1]
 
     decrypted_blocks = []
@@ -265,7 +256,6 @@ def decrypt_ecb(ciphertext, key):
 
     padded = b"".join(decrypted_blocks)
 
-    # Remove PKCS#7 padding
     amount = padded[-1]
 
     if (

@@ -11,8 +11,6 @@ print("Legacy Bank Client")
 message = input("Enter your transaction message: ")
 
 plaintext = message.encode("utf-8")
-
-# Encrypt the message and display the first Feistel round results
 encrypted_message = encrypt_ecb(
     plaintext, KEY, show_first_round=True
 )
