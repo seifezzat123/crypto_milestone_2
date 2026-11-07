@@ -5,7 +5,7 @@ from des import decrypt_ecb
 HOST = "127.0.0.1"
 PORT = 5000
 
-KEY = b"12345678"
+KEY = b"legacy26"
 
 print("Legacy Bank Server")
 
