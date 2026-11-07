@@ -1,4 +1,3 @@
-
 import socket
 from des import encrypt_ecb
 
@@ -13,11 +12,17 @@ message = input("Enter your transaction message: ")
 
 plaintext = message.encode("utf-8")
 
-encrypted_message = encrypt_ecb(plaintext, KEY)
+# Encrypt the message and display the first Feistel round results
+encrypted_message = encrypt_ecb(
+    plaintext, KEY, show_first_round=True
+)
 
 print("\nOriginal Message:", message)
 print("Encrypted Message (HEX):", encrypted_message.hex())
-print("Encrypted Message (Binary):", ''.join(format(byte, '08b') for byte in encrypted_message))
+print(
+    "Encrypted Message (Binary):",
+    ''.join(format(byte, '08b') for byte in encrypted_message)
+)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
